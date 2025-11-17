@@ -38,8 +38,3 @@ public class AlertController {
 		);
 	}
 }
-
-package com.powersense.analytics.alerts.interfaces.rest;
-
-public class AlertController {
-}

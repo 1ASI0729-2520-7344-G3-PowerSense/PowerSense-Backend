@@ -47,8 +47,3 @@ public class DashboardAlertResponse {
 		this.timestamp = timestamp;
 	}
 }
-
-package com.powersense.analytics.dashboard.interfaces.rest.resources;
-
-public class DashboardAlertResponse {
-}

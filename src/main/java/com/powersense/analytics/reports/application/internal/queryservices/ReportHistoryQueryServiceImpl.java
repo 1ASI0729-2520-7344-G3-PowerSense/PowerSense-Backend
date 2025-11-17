@@ -1,4 +1,3 @@
-git init
 package com.powersense.analytics.reports.application.internal.queryservices;
 
 import com.powersense.analytics.reports.application.model.ReportHistoryResponse;

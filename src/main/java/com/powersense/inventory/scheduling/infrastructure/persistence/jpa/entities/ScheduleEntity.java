@@ -5,6 +5,9 @@ import com.powersense.inventory.scheduling.domain.model.aggregates.Schedule;
 import com.powersense.inventory.scheduling.domain.model.entities.ScheduleEntry;
 import com.powersense.inventory.scheduling.domain.model.valueobjects.ScheduleId;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -13,6 +16,9 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "schedules")
+@Getter
+@Setter
+@NoArgsConstructor
 public class ScheduleEntity {
 	@Id
 	private String id;

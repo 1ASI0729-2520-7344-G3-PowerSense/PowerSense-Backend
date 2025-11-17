@@ -86,8 +86,3 @@ public class DashboardController {
 		return r;
 	}
 }
-
-package com.powersense.analytics.dashboard.interfaces.rest;
-
-public class DashboardController {
-}
