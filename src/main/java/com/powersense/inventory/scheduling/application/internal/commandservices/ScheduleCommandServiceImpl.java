@@ -44,11 +44,11 @@ public class ScheduleCommandServiceImpl {
 	private final DeviceControlAdapter deviceControl;
 
 	public ScheduleCommandServiceImpl(ScheduleRepository scheduleRepository,
-									  ScheduleRuleRepository scheduleRuleRepository,
-									  QuickScheduleRepository quickScheduleRepository,
-									  ScheduleService scheduleService,
-									  EventBus eventBus,
-									  DeviceControlAdapter deviceControl) {
+			ScheduleRuleRepository scheduleRuleRepository,
+			QuickScheduleRepository quickScheduleRepository,
+			ScheduleService scheduleService,
+			EventBus eventBus,
+			DeviceControlAdapter deviceControl) {
 		this.scheduleRepository = scheduleRepository;
 		this.scheduleRuleRepository = scheduleRuleRepository;
 		this.quickScheduleRepository = quickScheduleRepository;
@@ -66,7 +66,8 @@ public class ScheduleCommandServiceImpl {
 
 		List<ScheduleEntry> entries = toEntries(command.schedules());
 		ScheduleId id = scheduleRepository.nextIdentity();
-		Schedule schedule = new Schedule(id, deviceId, command.deviceName(), command.roomName(), command.enabled(), entries);
+		Schedule schedule = new Schedule(id, deviceId, command.deviceName(), command.roomName(), command.enabled(),
+				entries);
 
 		scheduleService.validateTimeSlotCoherence(entries);
 		schedule.validateNoTimeConflicts();
@@ -82,7 +83,7 @@ public class ScheduleCommandServiceImpl {
 				.orElseThrow(() -> new ScheduleNotFoundException(id.value()));
 
 		if (command.schedules() != null) {
-			// Replace all entries
+
 			List<ScheduleEntry> current = new ArrayList<>(schedule.getEntries());
 			for (int i = current.size() - 1; i >= 0; i--) {
 				schedule.removeEntry(i);
@@ -96,8 +97,10 @@ public class ScheduleCommandServiceImpl {
 		}
 
 		if (command.enabled() != null) {
-			if (command.enabled()) schedule.enable();
-			else schedule.disable();
+			if (command.enabled())
+				schedule.enable();
+			else
+				schedule.disable();
 		}
 
 		Schedule saved = scheduleRepository.save(schedule);
@@ -116,8 +119,10 @@ public class ScheduleCommandServiceImpl {
 		Schedule schedule = scheduleRepository.findById(id)
 				.orElseThrow(() -> new ScheduleNotFoundException(id.value()));
 
-		if (command.enabled()) schedule.enable();
-		else schedule.disable();
+		if (command.enabled())
+			schedule.enable();
+		else
+			schedule.disable();
 
 		Schedule saved = scheduleRepository.save(schedule);
 		eventBus.publish(saved.pullDomainEvents());
@@ -129,8 +134,10 @@ public class ScheduleCommandServiceImpl {
 		ScheduleRule rule = scheduleRuleRepository.findById(id)
 				.orElseThrow(() -> new RuleNotFoundException(id.value()));
 
-		if (command.enabled()) rule.enable();
-		else rule.disable();
+		if (command.enabled())
+			rule.enable();
+		else
+			rule.disable();
 
 		ScheduleRule saved = scheduleRuleRepository.save(rule);
 		eventBus.publish(saved.pullDomainEvents());
@@ -153,7 +160,7 @@ public class ScheduleCommandServiceImpl {
 			Optional<Schedule> existing = scheduleRepository.findByDeviceId(deviceId);
 			if (existing.isPresent()) {
 				Schedule schedule = existing.get();
-				// Replace entries with preset defaults
+
 				List<ScheduleEntry> current = new ArrayList<>(schedule.getEntries());
 				for (int i = current.size() - 1; i >= 0; i--) {
 					schedule.removeEntry(i);
@@ -166,7 +173,8 @@ public class ScheduleCommandServiceImpl {
 				eventBus.publish(schedule.pullDomainEvents());
 			} else {
 				ScheduleId id = scheduleRepository.nextIdentity();
-				Schedule schedule = new Schedule(id, deviceId, d.getName().value(), d.getLocation().roomName().value(), true, preset.getDefaultEntries());
+				Schedule schedule = new Schedule(id, deviceId, d.getName().value(), d.getLocation().roomName().value(),
+						true, preset.getDefaultEntries());
 				affected.add(scheduleRepository.save(schedule));
 				eventBus.publish(schedule.pullDomainEvents());
 			}
@@ -182,8 +190,10 @@ public class ScheduleCommandServiceImpl {
 				.orElseThrow(() -> new RuleNotFoundException(id.value()));
 
 		if (command.enabled() != null) {
-			if (command.enabled()) rule.enable();
-			else rule.disable();
+			if (command.enabled())
+				rule.enable();
+			else
+				rule.disable();
 		}
 		if (command.priority() != null) {
 			rule.setPriority(command.priority());
@@ -206,7 +216,8 @@ public class ScheduleCommandServiceImpl {
 	}
 
 	private List<ScheduleEntry> toEntries(List<CreateSchedule.ScheduleEntryData> data) {
-		if (data == null) return List.of();
+		if (data == null)
+			return List.of();
 		List<ScheduleEntry> entries = new ArrayList<>();
 		for (CreateSchedule.ScheduleEntryData d : data) {
 			ScheduleAction action = parseAction(d.action());
@@ -218,14 +229,16 @@ public class ScheduleCommandServiceImpl {
 	}
 
 	private ScheduleAction parseAction(String raw) {
-		if (raw == null) return ScheduleAction.OFF;
+		if (raw == null)
+			return ScheduleAction.OFF;
 		return "on".equalsIgnoreCase(raw) ? ScheduleAction.ON : ScheduleAction.OFF;
 	}
 
 	private ConditionType parseConditionType(String raw) {
 		String v = raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT);
 		for (ConditionType t : ConditionType.values()) {
-			if (t.name().equalsIgnoreCase(v) || t.toString().equalsIgnoreCase(v)) return t;
+			if (t.name().equalsIgnoreCase(v) || t.toString().equalsIgnoreCase(v))
+				return t;
 		}
 		throw new IllegalArgumentException("Unknown condition type: " + raw);
 	}
@@ -233,7 +246,8 @@ public class ScheduleCommandServiceImpl {
 	private ActionType parseActionType(String raw) {
 		String v = raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT);
 		for (ActionType t : ActionType.values()) {
-			if (t.name().equalsIgnoreCase(v) || t.toString().equalsIgnoreCase(v)) return t;
+			if (t.name().equalsIgnoreCase(v) || t.toString().equalsIgnoreCase(v))
+				return t;
 		}
 		throw new IllegalArgumentException("Unknown action type: " + raw);
 	}

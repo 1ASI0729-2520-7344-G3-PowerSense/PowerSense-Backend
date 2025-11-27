@@ -52,15 +52,17 @@ public class ScheduleRule {
 	}
 
 	public boolean shouldExecute(ScheduleExecutionContext context) {
-		if (!enabled) return false;
+		if (!enabled)
+			return false;
 		for (RuleCondition c : conditions) {
-			if (!c.isMet(context)) return false;
+			if (!c.isMet(context))
+				return false;
 		}
 		return true;
 	}
 
 	public void execute() {
-		// Execution effects are handled by executor; here we just raise an event.
+
 		registerEvent(new RuleExecuted(id.value(), name, 0, Instant.now()));
 	}
 

@@ -44,11 +44,12 @@ public class RuleCondition {
 	}
 
 	private boolean within(LocalTime start, LocalTime end, LocalTime now) {
-		if (start.equals(end)) return true;
+		if (start.equals(end))
+			return true;
 		if (start.isBefore(end)) {
 			return !now.isBefore(start) && !now.isAfter(end);
 		} else {
-			// across midnight
+
 			return !now.isBefore(start) || !now.isAfter(end);
 		}
 	}
@@ -72,8 +73,10 @@ public class RuleCondition {
 			Integer min = map.get("min") instanceof Number n ? n.intValue() : null;
 			Integer max = map.get("max") instanceof Number n ? n.intValue() : null;
 			int temp = context.currentTemperature();
-			if (min != null && temp < min) return false;
-			if (max != null && temp > max) return false;
+			if (min != null && temp < min)
+				return false;
+			if (max != null && temp > max)
+				return false;
 			return true;
 		}
 		throw new InvalidRuleConditionException("TEMPERATURE expects map {min,max}");

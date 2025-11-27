@@ -19,8 +19,8 @@ public class RuleAction {
 	private final Object value;
 
 	public RuleAction(ActionType type, List<String> deviceIds, List<String> roomIds,
-					  List<String> excludeDeviceIds, List<String> excludeRoomIds,
-					  String category, Object value) {
+			List<String> excludeDeviceIds, List<String> excludeRoomIds,
+			String category, Object value) {
 		this.type = Objects.requireNonNull(type, "type");
 		this.deviceIds = deviceIds != null ? List.copyOf(deviceIds) : List.of();
 		this.roomIds = roomIds != null ? List.copyOf(roomIds) : List.of();
@@ -31,7 +31,7 @@ public class RuleAction {
 	}
 
 	public void execute(ScheduleExecutionContext context) {
-		// No side effects in domain; execution happens via executor service in application layer.
+
 	}
 
 	public List<Device> getAffectedDevices(List<Device> allDevices) {
@@ -40,16 +40,19 @@ public class RuleAction {
 			res = res.stream().filter(d -> deviceIds.contains(d.getId().value())).collect(Collectors.toList());
 		}
 		if (!roomIds.isEmpty()) {
-			res = res.stream().filter(d -> roomIds.contains(d.getLocation().roomId().value())).collect(Collectors.toList());
+			res = res.stream().filter(d -> roomIds.contains(d.getLocation().roomId().value()))
+					.collect(Collectors.toList());
 		}
 		if (category != null && !category.isBlank()) {
-			res = res.stream().filter(d -> d.getCategory().value().equalsIgnoreCase(category)).collect(Collectors.toList());
+			res = res.stream().filter(d -> d.getCategory().value().equalsIgnoreCase(category))
+					.collect(Collectors.toList());
 		}
 		if (!excludeDeviceIds.isEmpty()) {
 			res = res.stream().filter(d -> !excludeDeviceIds.contains(d.getId().value())).collect(Collectors.toList());
 		}
 		if (!excludeRoomIds.isEmpty()) {
-			res = res.stream().filter(d -> !excludeRoomIds.contains(d.getLocation().roomId().value())).collect(Collectors.toList());
+			res = res.stream().filter(d -> !excludeRoomIds.contains(d.getLocation().roomId().value()))
+					.collect(Collectors.toList());
 		}
 		return res;
 	}

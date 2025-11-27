@@ -20,8 +20,8 @@ public class ReportKPIQueryServiceImpl {
 	private final ComparisonCalculator comparisonCalculator;
 
 	public ReportKPIQueryServiceImpl(DeviceRepository deviceRepository,
-									 ConsumptionCalculator consumptionCalculator,
-									 ComparisonCalculator comparisonCalculator) {
+			ConsumptionCalculator consumptionCalculator,
+			ComparisonCalculator comparisonCalculator) {
 		this.deviceRepository = deviceRepository;
 		this.consumptionCalculator = consumptionCalculator;
 		this.comparisonCalculator = comparisonCalculator;
@@ -33,7 +33,7 @@ public class ReportKPIQueryServiceImpl {
 		LocalDate start = now.withDayOfMonth(1);
 		double totalConsumption = consumptionCalculator.calculateTotalConsumption(devices, start, now);
 		double totalCost = totalConsumption * KWH_RATE;
-		int efficiency = 87; // mock simple; puede ser derivado de schedules si se desea
+		int efficiency = 87;
 		var comparison = comparisonCalculator.compareWithPreviousPeriod(totalConsumption);
 		return new ReportKPIsResponse(totalConsumption, totalCost, efficiency, comparison);
 	}

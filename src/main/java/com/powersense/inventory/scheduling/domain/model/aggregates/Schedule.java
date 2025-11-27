@@ -25,7 +25,7 @@ public class Schedule {
 	private final List<DomainEvent> domainEvents = new ArrayList<>();
 
 	public Schedule(ScheduleId id, DeviceId deviceId, String deviceName, String roomName, boolean enabled,
-					List<ScheduleEntry> initialEntries) {
+			List<ScheduleEntry> initialEntries) {
 		this.id = Objects.requireNonNull(id, "id");
 		this.deviceId = Objects.requireNonNull(deviceId, "deviceId");
 		this.deviceName = Objects.requireNonNull(deviceName, "deviceName");
@@ -88,14 +88,14 @@ public class Schedule {
 	}
 
 	public void validateNoTimeConflicts() {
-		// Basic rule: no two entries with same action at the same time on the same day
+
 		for (int i = 0; i < entries.size(); i++) {
 			for (int j = i + 1; j < entries.size(); j++) {
 				var a = entries.get(i);
 				var b = entries.get(j);
 				if (a.getAction() == b.getAction() &&
 						a.getTime().toLocalTime().equals(b.getTime().toLocalTime())) {
-					// intersecting days?
+
 					boolean overlap = a.getDays().stream().anyMatch(d -> b.getDays().contains(d));
 					if (overlap) {
 						throw new IllegalStateException("Overlapping schedule entries for same action/time");
