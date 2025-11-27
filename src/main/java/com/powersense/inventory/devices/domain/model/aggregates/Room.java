@@ -11,13 +11,23 @@ import java.util.Objects;
 
 public class Room {
     private final RoomId id;
-    private final RoomName name;
+    private RoomName name;
     private final List<DeviceId> deviceIds = new ArrayList<>();
 
     public Room(RoomId id, RoomName name) {
         this.id = Objects.requireNonNull(id, "id");
         this.name = Objects.requireNonNull(name, "name");
     }
+
+    public static Room create(RoomId id, RoomName name) {
+        return new Room(id, name);
+    }
+
+    public void updateName(RoomName newName) {
+        this.name = Objects.requireNonNull(newName, "newName");
+    }
+
+
 
     public void addDevice(DeviceId deviceId) {
         Objects.requireNonNull(deviceId, "deviceId");

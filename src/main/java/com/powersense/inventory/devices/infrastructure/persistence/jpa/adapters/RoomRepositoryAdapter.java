@@ -28,6 +28,20 @@ public class RoomRepositoryAdapter implements RoomRepository {
 	public List<Room> findAll() {
 		return jpaRepository.findAll().stream().map(RoomEntity::toDomain).collect(Collectors.toList());
 	}
+
+	@Override
+	public Room save(Room room) {
+		RoomEntity entity = RoomEntity.fromDomain(room);
+		RoomEntity saved = jpaRepository.save(entity);
+		return saved.toDomain();
+	}
+
+	@Override
+	public void delete(RoomId id) {
+		jpaRepository.deleteById(id.value());
+	}
 }
+
+
 
 

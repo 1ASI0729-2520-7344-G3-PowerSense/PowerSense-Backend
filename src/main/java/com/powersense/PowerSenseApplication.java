@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling  // Habilita @Scheduled para ejecutar reglas automáticamente
+@EnableScheduling
 public class PowerSenseApplication {
 
     public static void main(String[] args) {
