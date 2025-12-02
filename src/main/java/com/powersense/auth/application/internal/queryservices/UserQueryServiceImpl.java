@@ -11,24 +11,27 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional(readOnly = true) // Solo consultas, sin modificaciones
 public class UserQueryServiceImpl implements UserQueryService {
 
     private final UserRepository userRepository;
 
+    // Inyección del repositorio JPA
     public UserQueryServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
     public Optional<User> handle(GetUserByIdQuery query) {
+        // Busca por ID y devuelve solo si el usuario está activo
         return userRepository.findById(query.userId())
-                .filter(User::getIsActive); // Solo usuarios activos
+                .filter(User::getIsActive);
     }
 
     @Override
     public Optional<User> handle(GetUserByEmailQuery query) {
+        // Busca por email y devuelve solo si el usuario está activo
         return userRepository.findByEmail_Value(query.email())
-                .filter(User::getIsActive); // Solo usuarios activos
+                .filter(User::getIsActive);
     }
 }
