@@ -8,23 +8,24 @@ import org.springframework.stereotype.Component;
 @Component("devicesEventBus")
 public class SpringEventBus implements EventBus {
 
-	private final ApplicationEventPublisher publisher;
+    // Publicador de eventos propio de Spring
+    private final ApplicationEventPublisher publisher;
 
-	public SpringEventBus(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
+    public SpringEventBus(ApplicationEventPublisher publisher) {
+        this.publisher = publisher;
+    }
 
-	@Override
-	public void publish(DomainEvent event) {
-		publisher.publishEvent(event);
-	}
+    @Override
+    public void publish(DomainEvent event) {
+        // Publica un solo evento de dominio
+        publisher.publishEvent(event);
+    }
 
-	@Override
-	public void publish(Iterable<? extends DomainEvent> events) {
-		for (DomainEvent e : events) {
-			publisher.publishEvent(e);
-		}
-	}
+    @Override
+    public void publish(Iterable<? extends DomainEvent> events) {
+        // Publica varios eventos uno por uno
+        for (DomainEvent e : events) {
+            publisher.publishEvent(e);
+        }
+    }
 }
-
-
