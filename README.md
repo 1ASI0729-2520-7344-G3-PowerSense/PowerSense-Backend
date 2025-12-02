@@ -2,6 +2,12 @@
 
 PowerSense is a backend application built with **Java (Spring Boot)** following **Domain-Driven Design (DDD)** principles. It uses **MySQL** as the database (hosted on Railway) and is deployed on **Render**. The frontend is hosted on **GitHub Pages**.
 
+![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-green?style=for-the-badge&logo=spring-boot)
+![MySQL](https://img.shields.io/badge/MySQL-Railway-blue?style=for-the-badge&logo=mysql)
+![Docker](https://img.shields.io/badge/Docker-Enabled-blue?style=for-the-badge&logo=docker)
+![Render](https://img.shields.io/badge/Deployment-Render-black?style=for-the-badge&logo=render)
+
 ---
 
 ## Architecture
@@ -19,6 +25,18 @@ The project is organized using a classic DDD structure:
 - **inventory**: Devices, rooms, scheduling
 - **shared**: Common domain and infrastructure components
 
+### Project Structure
+The solution follows a strict DDD architecture:
+
+```text
+src/main/java/com/powersense
+├── analytics          # Dashboard, Reports, alerts
+├── auth               # Security config, Users
+├── inventory          # Devices, Schedules
+└── shared             # Common exceptions, DTOs, Utils
+    ├── domain         # Entities & Value Objects
+    ├── infrastructure # Utils, messaging
+```
 ---
 
 ## Technologies
