@@ -79,4 +79,11 @@ public class AlertRepositoryAdapter implements AlertRepository {
     public AlertId nextIdentity() {
         return new AlertId(UUID.randomUUID().toString());
     }
+
+    @Override
+    public List<Alert> findAllByUserId(Long userId) {
+        return jpaRepository.findAllByUserId(userId).stream()
+                .map(AlertEntity::toDomain)
+                .collect(Collectors.toList());
+    }
 }

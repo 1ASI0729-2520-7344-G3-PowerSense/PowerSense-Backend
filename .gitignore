@@ -32,5 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
-### Git ###
+#no .md
 *.md
+*.MD
+
+# SQL migration and sample files
+src/main/resources/sample-users.sql
+src/main/resources/migration-ownership.sql

@@ -40,6 +40,9 @@ public class DeviceEntity {
 	@Embedded
 	private PowerSpecificationEmbeddable power;
 
+	@Column(name = "user_id")
+	private Long userId;
+
 	@Column(name = "created_at")
 	private Instant createdAt;
 
@@ -50,14 +53,15 @@ public class DeviceEntity {
 	}
 
 	public DeviceEntity(String id, String name, DeviceCategory category, DeviceStatus status,
-						LocationEmbeddable location, PowerSpecificationEmbeddable power,
-						Instant createdAt, Instant updatedAt) {
+			LocationEmbeddable location, PowerSpecificationEmbeddable power,
+			Long userId, Instant createdAt, Instant updatedAt) {
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.status = status;
 		this.location = location;
 		this.power = power;
+		this.userId = userId;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
@@ -71,9 +75,9 @@ public class DeviceEntity {
 				device.getStatus(),
 				LocationEmbeddable.fromDomain(device.getLocation()),
 				PowerSpecificationEmbeddable.fromDomain(device.getPower()),
+				device.getUserId(),
 				now,
-				now
-		);
+				now);
 	}
 
 	public Device toDomain() {
@@ -83,8 +87,8 @@ public class DeviceEntity {
 				category,
 				status,
 				location.toDomain(),
-				power.toDomain()
-		);
+				power.toDomain(),
+				userId);
 	}
 
 	public String getId() {
@@ -150,6 +154,12 @@ public class DeviceEntity {
 	public void setUpdatedAt(Instant updatedAt) {
 		this.updatedAt = updatedAt;
 	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 }
-
-

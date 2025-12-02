@@ -24,7 +24,10 @@ import com.powersense.inventory.devices.domain.model.commands.SetDeviceStatus;
 import com.powersense.inventory.devices.domain.model.commands.SetRoomDevicesStatus;
 import com.powersense.inventory.devices.domain.model.commands.SetAllDevicesStatus;
 import com.powersense.inventory.devices.domain.model.commands.ImportDevices;
+import com.powersense.auth.infrastructure.tokens.JwtTokenService;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -37,20 +40,24 @@ public class DeviceCommandServiceImpl {
 
     private final DeviceRepository deviceRepository;
     private final EventBus eventBus;
+    private final JwtTokenService jwtTokenService;
 
-    public DeviceCommandServiceImpl(DeviceRepository deviceRepository, EventBus eventBus) {
+    public DeviceCommandServiceImpl(DeviceRepository deviceRepository, EventBus eventBus,
+            JwtTokenService jwtTokenService) {
         this.deviceRepository = deviceRepository;
         this.eventBus = eventBus;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public Device createDevice(CreateDevice command) {
+        Long userId = getCurrentUserId();
         DeviceId id = deviceRepository.nextIdentity();
         DeviceName name = new DeviceName(command.name());
         DeviceCategory category = parseCategory(command.category());
         Location location = new Location(new RoomId(command.roomId()), new RoomName(command.roomName()));
         PowerSpecification power = new PowerSpecification(command.watts(), null, null);
 
-        Device device = Device.create(id, name, category, location, power);
+        Device device = Device.create(id, name, category, location, power, userId);
         deviceRepository.save(device);
         eventBus.publish(device.pullDomainEvents());
         return device;
@@ -62,7 +69,8 @@ public class DeviceCommandServiceImpl {
                 .orElseThrow(() -> new DeviceNotFoundException(id.value()));
 
         DeviceName name = command.name() != null ? new DeviceName(command.name()) : existing.getName();
-        DeviceCategory category = command.category() != null ? parseCategory(command.category()) : existing.getCategory();
+        DeviceCategory category = command.category() != null ? parseCategory(command.category())
+                : existing.getCategory();
 
         Location location = existing.getLocation();
         if (command.roomId() != null || command.roomName() != null) {
@@ -76,7 +84,8 @@ public class DeviceCommandServiceImpl {
             power = new PowerSpecification(command.watts(), power.voltage(), power.amperage());
         }
 
-        Device updated = new Device(existing.getId(), name, category, existing.getStatus(), location, power);
+        Device updated = new Device(existing.getId(), name, category, existing.getStatus(), location, power,
+                existing.getUserId());
         deviceRepository.save(updated);
         eventBus.publish(new DeviceUpdated(id.value(), Instant.now()));
         return updated;
@@ -137,8 +146,7 @@ public class DeviceCommandServiceImpl {
                 roomName,
                 targetStatus.value(),
                 affected,
-                Instant.now()
-        ));
+                Instant.now()));
     }
 
     public void setAllDevicesStatus(SetAllDevicesStatus command) {
@@ -167,6 +175,7 @@ public class DeviceCommandServiceImpl {
     }
 
     public void importDevices(ImportDevices command) {
+        Long userId = getCurrentUserId();
         List<Device> toSave = new ArrayList<>();
         List<com.powersense.inventory.devices.domain.model.events.DomainEvent> collected = new ArrayList<>();
 
@@ -176,18 +185,20 @@ public class DeviceCommandServiceImpl {
             DeviceCategory category = parseCategory(d.category());
             Location location = new Location(new RoomId(d.roomId()), new RoomName(d.roomName()));
             PowerSpecification power = new PowerSpecification(d.watts(), null, null);
-            Device device = Device.create(id, name, category, location, power);
+            Device device = Device.create(id, name, category, location, power, userId);
             collected.addAll(device.pullDomainEvents());
             toSave.add(device);
         }
 
         deviceRepository.saveAll(toSave);
         eventBus.publish(collected);
-        eventBus.publish(new com.powersense.inventory.devices.domain.model.events.DevicesImported(toSave.size(), Instant.now()));
+        eventBus.publish(
+                new com.powersense.inventory.devices.domain.model.events.DevicesImported(toSave.size(), Instant.now()));
     }
 
     private DeviceCategory parseCategory(String raw) {
-        if (raw == null) return DeviceCategory.GENERIC_POWER;
+        if (raw == null)
+            return DeviceCategory.GENERIC_POWER;
         String val = raw.trim();
         for (DeviceCategory c : DeviceCategory.values()) {
             if (c.name().equalsIgnoreCase(val) || c.value().equalsIgnoreCase(val)) {
@@ -207,5 +218,17 @@ public class DeviceCommandServiceImpl {
             case "inactive" -> DeviceStatus.INACTIVE;
             default -> throw new InvalidDeviceStatusException("Invalid status: " + raw);
         };
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        String token = (String) authentication.getCredentials();
+        if (token == null) {
+            return null;
+        }
+        return jwtTokenService.extractUserId(token);
     }
 }

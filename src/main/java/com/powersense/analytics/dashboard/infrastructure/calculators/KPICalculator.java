@@ -9,7 +9,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class KPICalculator implements com.powersense.analytics.dashboard.application.internal.calculators.KPICalculator {
+public class KPICalculator
+		implements com.powersense.analytics.dashboard.application.internal.calculators.KPICalculator {
 
 	private static final double KWH_RATE = 0.15; // USD por kWh
 	private static final int HOURS_ACTIVE_PER_DAY = 8;
@@ -19,7 +20,7 @@ public class KPICalculator implements com.powersense.analytics.dashboard.applica
 	public double calculateTotalConsumption(List<Device> devices) {
 		// Estimación: suma de watts * horas promedio de uso diario / 1000, solo activos
 		double dailyKWh = devices.stream()
-				.filter(d -> d.getStatus() == DeviceStatus.ACTIVE)
+				.filter(d -> d.getStatus() == DeviceStatus.ACTIVE && d.getPower() != null)
 				.mapToDouble(d -> (d.getPower().watts() * (double) HOURS_ACTIVE_PER_DAY) / 1000.0)
 				.sum();
 		return dailyKWh * DAYS_PER_MONTH;
@@ -33,7 +34,8 @@ public class KPICalculator implements com.powersense.analytics.dashboard.applica
 	@Override
 	public int calculateEfficiency(List<Device> devices, List<Schedule> schedules) {
 		long enabledSchedules = schedules.stream().filter(Schedule::isEnabled).count();
-		if (devices.isEmpty()) return 0;
+		if (devices.isEmpty())
+			return 0;
 		int baseEfficiency = (int) Math.round((enabledSchedules * 100.0) / devices.size());
 		return Math.min(baseEfficiency, 100);
 	}

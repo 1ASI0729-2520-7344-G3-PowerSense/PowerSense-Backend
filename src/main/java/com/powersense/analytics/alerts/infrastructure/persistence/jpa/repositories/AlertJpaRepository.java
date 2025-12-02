@@ -9,7 +9,12 @@ import java.util.List;
 
 public interface AlertJpaRepository extends JpaRepository<AlertEntity, String> {
     List<AlertEntity> findByType(AlertType type);
+
     List<AlertEntity> findBySeverity(AlertSeverity severity);
+
     List<AlertEntity> findByDeviceId(String deviceId);
+
     List<AlertEntity> findByAcknowledged(boolean acknowledged);
+
+    List<AlertEntity> findAllByUserId(Long userId);
 }

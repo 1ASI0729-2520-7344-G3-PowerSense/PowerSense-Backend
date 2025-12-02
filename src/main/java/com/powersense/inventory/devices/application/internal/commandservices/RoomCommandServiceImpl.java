@@ -10,6 +10,9 @@ import com.powersense.inventory.devices.domain.model.commands.UpdateRoom;
 import com.powersense.inventory.devices.domain.model.valueobjects.Location;
 import com.powersense.inventory.devices.domain.model.valueobjects.RoomId;
 import com.powersense.inventory.devices.domain.model.valueobjects.RoomName;
+import com.powersense.auth.infrastructure.tokens.JwtTokenService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,18 +24,23 @@ public class RoomCommandServiceImpl {
 
 	private final RoomRepository roomRepository;
 	private final DeviceRepository deviceRepository;
+	private final JwtTokenService jwtTokenService;
 
-	public RoomCommandServiceImpl(RoomRepository roomRepository, DeviceRepository deviceRepository) {
+	public RoomCommandServiceImpl(RoomRepository roomRepository, DeviceRepository deviceRepository,
+			JwtTokenService jwtTokenService) {
 		this.roomRepository = roomRepository;
 		this.deviceRepository = deviceRepository;
+		this.jwtTokenService = jwtTokenService;
 	}
 
 	public Room createRoom(CreateRoom command) {
+		Long userId = getCurrentUserId();
 		String generatedId = UUID.randomUUID().toString();
 
 		Room room = Room.create(
 				new RoomId(generatedId),
-				new RoomName(command.name()));
+				new RoomName(command.name()),
+				userId);
 
 		return roomRepository.save(room);
 	}
@@ -77,5 +85,17 @@ public class RoomCommandServiceImpl {
 		}
 
 		return updatedRoom;
+	}
+
+	private Long getCurrentUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return null;
+		}
+		String token = (String) authentication.getCredentials();
+		if (token == null) {
+			return null;
+		}
+		return jwtTokenService.extractUserId(token);
 	}
 }

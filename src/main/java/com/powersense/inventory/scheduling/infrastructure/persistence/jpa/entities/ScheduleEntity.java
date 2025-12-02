@@ -38,6 +38,9 @@ public class ScheduleEntity {
 	@OneToMany(mappedBy = "schedule", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ScheduleEntryEntity> entries = new ArrayList<>();
 
+	@Column(name = "user_id")
+	private Long userId;
+
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
@@ -51,6 +54,7 @@ public class ScheduleEntity {
 		e.deviceName = schedule.getDeviceName();
 		e.roomName = schedule.getRoomName();
 		e.enabled = schedule.isEnabled();
+		e.userId = schedule.getUserId();
 		e.createdAt = schedule.getCreatedAt();
 		e.updatedAt = schedule.getUpdatedAt();
 		e.entries = schedule.getEntries().stream()
@@ -68,8 +72,8 @@ public class ScheduleEntity {
 				deviceName,
 				roomName,
 				enabled,
-				domainEntries
-		);
+				domainEntries,
+				userId);
 	}
 
 	public void addEntry(ScheduleEntryEntity entry) {
@@ -82,5 +86,3 @@ public class ScheduleEntity {
 		this.entries.remove(entry);
 	}
 }
-
-

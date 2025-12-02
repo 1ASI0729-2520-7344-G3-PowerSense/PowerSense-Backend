@@ -15,7 +15,8 @@ public class RoomRepositoryAdapter implements RoomRepository {
 
 	private final com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.RoomRepository jpaRepository;
 
-	public RoomRepositoryAdapter(com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.RoomRepository jpaRepository) {
+	public RoomRepositoryAdapter(
+			com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.RoomRepository jpaRepository) {
 		this.jpaRepository = jpaRepository;
 	}
 
@@ -40,8 +41,11 @@ public class RoomRepositoryAdapter implements RoomRepository {
 	public void delete(RoomId id) {
 		jpaRepository.deleteById(id.value());
 	}
+
+	@Override
+	public List<Room> findAllByUserId(Long userId) {
+		return jpaRepository.findAllByUserId(userId).stream()
+				.map(RoomEntity::toDomain)
+				.collect(Collectors.toList());
+	}
 }
-
-
-
-

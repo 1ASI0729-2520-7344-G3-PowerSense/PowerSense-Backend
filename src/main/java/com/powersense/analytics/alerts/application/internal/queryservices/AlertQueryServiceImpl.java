@@ -8,6 +8,9 @@ import com.powersense.analytics.alerts.domain.model.queries.ListAlerts;
 import com.powersense.analytics.alerts.domain.model.valueobjects.AlertId;
 import com.powersense.analytics.alerts.domain.model.valueobjects.AlertSeverity;
 import com.powersense.analytics.alerts.domain.model.valueobjects.AlertType;
+import com.powersense.auth.infrastructure.tokens.JwtTokenService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,13 +20,16 @@ import java.util.stream.Collectors;
 public class AlertQueryServiceImpl {
 
     private final AlertRepository alertRepository;
+    private final JwtTokenService jwtTokenService;
 
-    public AlertQueryServiceImpl(AlertRepository alertRepository) {
+    public AlertQueryServiceImpl(AlertRepository alertRepository, JwtTokenService jwtTokenService) {
         this.alertRepository = alertRepository;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public List<Alert> listAlerts(ListAlerts query) {
-        List<Alert> alerts = alertRepository.findAll();
+        Long userId = getCurrentUserId();
+        List<Alert> alerts = userId != null ? alertRepository.findAllByUserId(userId) : alertRepository.findAll();
 
         if (query.type() != null && !query.type().isBlank()) {
             AlertType type = AlertType.valueOf(query.type().toUpperCase());
@@ -57,5 +63,17 @@ public class AlertQueryServiceImpl {
     public Alert getAlertById(GetAlertById query) {
         return alertRepository.findById(new AlertId(query.alertId()))
                 .orElseThrow(() -> new AlertNotFoundException(query.alertId()));
+    }
+
+    private Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        String token = (String) authentication.getCredentials();
+        if (token == null) {
+            return null;
+        }
+        return jwtTokenService.extractUserId(token);
     }
 }

@@ -12,22 +12,22 @@ import java.util.Objects;
 public class Room {
     private final RoomId id;
     private RoomName name;
+    private Long userId;
     private final List<DeviceId> deviceIds = new ArrayList<>();
 
-    public Room(RoomId id, RoomName name) {
+    public Room(RoomId id, RoomName name, Long userId) {
         this.id = Objects.requireNonNull(id, "id");
         this.name = Objects.requireNonNull(name, "name");
+        this.userId = userId;
     }
 
-    public static Room create(RoomId id, RoomName name) {
-        return new Room(id, name);
+    public static Room create(RoomId id, RoomName name, Long userId) {
+        return new Room(id, name, userId);
     }
 
     public void updateName(RoomName newName) {
         this.name = Objects.requireNonNull(newName, "newName");
     }
-
-
 
     public void addDevice(DeviceId deviceId) {
         Objects.requireNonNull(deviceId, "deviceId");
@@ -51,5 +51,9 @@ public class Room {
 
     public RoomName getName() {
         return name;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

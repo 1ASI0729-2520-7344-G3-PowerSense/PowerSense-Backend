@@ -17,7 +17,8 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
 
 	private final com.powersense.inventory.scheduling.infrastructure.persistence.jpa.repositories.ScheduleRepository jpaRepository;
 
-	public ScheduleRepositoryAdapter(com.powersense.inventory.scheduling.infrastructure.persistence.jpa.repositories.ScheduleRepository jpaRepository) {
+	public ScheduleRepositoryAdapter(
+			com.powersense.inventory.scheduling.infrastructure.persistence.jpa.repositories.ScheduleRepository jpaRepository) {
 		this.jpaRepository = jpaRepository;
 	}
 
@@ -56,6 +57,11 @@ public class ScheduleRepositoryAdapter implements ScheduleRepository {
 	public ScheduleId nextIdentity() {
 		return new ScheduleId("sch-" + UUID.randomUUID());
 	}
+
+	@Override
+	public List<Schedule> findAllByUserId(Long userId) {
+		return jpaRepository.findAllByUserId(userId).stream()
+				.map(ScheduleEntity::toDomain)
+				.collect(Collectors.toList());
+	}
 }
-
-

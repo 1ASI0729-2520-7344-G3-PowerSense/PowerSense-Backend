@@ -8,8 +8,14 @@ import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<ScheduleEntity, String> {
 	Optional<ScheduleEntity> findByDeviceId(String deviceId);
+
 	List<ScheduleEntity> findByEnabled(boolean enabled);
+
 	List<ScheduleEntity> findByRoomName(String roomName);
+
 	List<ScheduleEntity> findByDeviceNameContainingIgnoreCase(String search);
+
 	boolean existsByDeviceId(String deviceId);
+
+	List<ScheduleEntity> findAllByUserId(Long userId);
 }

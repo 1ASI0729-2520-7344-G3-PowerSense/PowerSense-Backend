@@ -29,8 +29,7 @@ public class AlertGenerator {
 					"error",
 					"error",
 					"Consumo excesivo detectado en " + highConsumption.size() + " dispositivos",
-					Instant.now()
-			));
+					Instant.now()));
 		}
 
 		long disabled = schedules.stream().filter(s -> !s.isEnabled()).count();
@@ -40,8 +39,7 @@ public class AlertGenerator {
 					"warning",
 					"warning",
 					disabled + " programaciones deshabilitadas",
-					Instant.now()
-			));
+					Instant.now()));
 		}
 
 		alerts.add(new DashboardAlertResponse(
@@ -49,17 +47,18 @@ public class AlertGenerator {
 				"info",
 				"check_circle",
 				"Sistema funcionando correctamente",
-				Instant.now()
-		));
+				Instant.now()));
 
 		return alerts.stream().limit(5).toList();
 	}
 
 	public boolean isHighConsumption(Device device) {
-		return device.getStatus() == DeviceStatus.ACTIVE && device.getPower().watts() > 500;
+		return device.getStatus() == DeviceStatus.ACTIVE && device.getPower() != null
+				&& device.getPower().watts() > 500;
 	}
 
-	public boolean shouldBeActive(Device device, LocalTime currentTime, DayOfWeek currentDay, List<Schedule> schedules) {
+	public boolean shouldBeActive(Device device, LocalTime currentTime, DayOfWeek currentDay,
+			List<Schedule> schedules) {
 		return schedules.stream()
 				.filter(Schedule::isEnabled)
 				.filter(s -> s.getDeviceId().value().equals(device.getId().value()))

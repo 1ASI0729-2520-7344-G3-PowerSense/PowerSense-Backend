@@ -21,6 +21,9 @@ import com.powersense.inventory.scheduling.domain.model.events.QuickScheduleAppl
 import com.powersense.inventory.scheduling.domain.model.events.ScheduleDeleted;
 import com.powersense.inventory.scheduling.domain.model.valueobjects.*;
 import com.powersense.inventory.scheduling.domain.services.ScheduleService;
+import com.powersense.auth.infrastructure.tokens.JwtTokenService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,22 +45,26 @@ public class ScheduleCommandServiceImpl {
 	private final ScheduleService scheduleService;
 	private final EventBus eventBus;
 	private final DeviceControlAdapter deviceControl;
+	private final JwtTokenService jwtTokenService;
 
 	public ScheduleCommandServiceImpl(ScheduleRepository scheduleRepository,
 			ScheduleRuleRepository scheduleRuleRepository,
 			QuickScheduleRepository quickScheduleRepository,
 			ScheduleService scheduleService,
 			EventBus eventBus,
-			DeviceControlAdapter deviceControl) {
+			DeviceControlAdapter deviceControl,
+			JwtTokenService jwtTokenService) {
 		this.scheduleRepository = scheduleRepository;
 		this.scheduleRuleRepository = scheduleRuleRepository;
 		this.quickScheduleRepository = quickScheduleRepository;
 		this.scheduleService = scheduleService;
 		this.eventBus = eventBus;
 		this.deviceControl = deviceControl;
+		this.jwtTokenService = jwtTokenService;
 	}
 
 	public Schedule createSchedule(CreateSchedule command) {
+		Long userId = getCurrentUserId();
 		DeviceId deviceId = new DeviceId(command.deviceId());
 		Optional<Schedule> existing = scheduleRepository.findByDeviceId(deviceId);
 		if (existing.isPresent()) {
@@ -67,7 +74,7 @@ public class ScheduleCommandServiceImpl {
 		List<ScheduleEntry> entries = toEntries(command.schedules());
 		ScheduleId id = scheduleRepository.nextIdentity();
 		Schedule schedule = new Schedule(id, deviceId, command.deviceName(), command.roomName(), command.enabled(),
-				entries);
+				entries, userId);
 
 		scheduleService.validateTimeSlotCoherence(entries);
 		schedule.validateNoTimeConflicts();
@@ -172,9 +179,10 @@ public class ScheduleCommandServiceImpl {
 				affected.add(scheduleRepository.save(schedule));
 				eventBus.publish(schedule.pullDomainEvents());
 			} else {
+				Long userId = getCurrentUserId();
 				ScheduleId id = scheduleRepository.nextIdentity();
 				Schedule schedule = new Schedule(id, deviceId, d.getName().value(), d.getLocation().roomName().value(),
-						true, preset.getDefaultEntries());
+						true, preset.getDefaultEntries(), userId);
 				affected.add(scheduleRepository.save(schedule));
 				eventBus.publish(schedule.pullDomainEvents());
 			}
@@ -250,5 +258,17 @@ public class ScheduleCommandServiceImpl {
 				return t;
 		}
 		throw new IllegalArgumentException("Unknown action type: " + raw);
+	}
+
+	private Long getCurrentUserId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return null;
+		}
+		String token = (String) authentication.getCredentials();
+		if (token == null) {
+			return null;
+		}
+		return jwtTokenService.extractUserId(token);
 	}
 }

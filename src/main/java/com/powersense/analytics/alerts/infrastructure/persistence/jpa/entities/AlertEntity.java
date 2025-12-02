@@ -38,6 +38,9 @@ public class AlertEntity {
     @Column
     private Instant acknowledgedAt;
 
+    @Column(name = "user_id")
+    private Long userId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -48,8 +51,8 @@ public class AlertEntity {
     }
 
     public AlertEntity(String id, AlertType type, AlertSeverity severity, String deviceId,
-                       Double threshold, String message, boolean acknowledged, Instant acknowledgedAt,
-                       Instant createdAt, Instant updatedAt) {
+            Double threshold, String message, boolean acknowledged, Instant acknowledgedAt,
+            Long userId, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.type = type;
         this.severity = severity;
@@ -58,6 +61,7 @@ public class AlertEntity {
         this.message = message;
         this.acknowledged = acknowledged;
         this.acknowledgedAt = acknowledgedAt;
+        this.userId = userId;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -72,9 +76,9 @@ public class AlertEntity {
                 alert.getMessage(),
                 alert.isAcknowledged(),
                 alert.getAcknowledgedAt(),
+                alert.getUserId(),
                 alert.getCreatedAt(),
-                alert.getUpdatedAt()
-        );
+                alert.getUpdatedAt());
     }
 
     public Alert toDomain() {
@@ -84,13 +88,13 @@ public class AlertEntity {
                 severity,
                 deviceId,
                 threshold,
-                message
-        );
-        
+                message,
+                userId);
+
         if (acknowledged) {
             alert.acknowledge();
         }
-        
+
         return alert;
     }
 
@@ -173,5 +177,13 @@ public class AlertEntity {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 }

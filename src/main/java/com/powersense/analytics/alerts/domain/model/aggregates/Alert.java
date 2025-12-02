@@ -16,11 +16,12 @@ public class Alert {
     private String message;
     private boolean acknowledged;
     private Instant acknowledgedAt;
+    private Long userId;
     private final Instant createdAt;
     private Instant updatedAt;
 
-    public Alert(AlertId id, AlertType type, AlertSeverity severity, String deviceId, 
-                 Double threshold, String message) {
+    public Alert(AlertId id, AlertType type, AlertSeverity severity, String deviceId,
+            Double threshold, String message, Long userId) {
         this.id = Objects.requireNonNull(id, "id");
         this.type = Objects.requireNonNull(type, "type");
         this.severity = Objects.requireNonNull(severity, "severity");
@@ -29,13 +30,14 @@ public class Alert {
         this.message = Objects.requireNonNull(message, "message");
         this.acknowledged = false;
         this.acknowledgedAt = null;
+        this.userId = userId;
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
 
-    public static Alert create(AlertId id, AlertType type, AlertSeverity severity, 
-                               String deviceId, Double threshold, String message) {
-        return new Alert(id, type, severity, deviceId, threshold, message);
+    public static Alert create(AlertId id, AlertType type, AlertSeverity severity,
+            String deviceId, Double threshold, String message, Long userId) {
+        return new Alert(id, type, severity, deviceId, threshold, message, userId);
     }
 
     public void acknowledge() {
@@ -93,5 +95,9 @@ public class Alert {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

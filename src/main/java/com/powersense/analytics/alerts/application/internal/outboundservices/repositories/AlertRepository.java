@@ -10,12 +10,22 @@ import java.util.Optional;
 
 public interface AlertRepository {
     Optional<Alert> findById(AlertId id);
+
     List<Alert> findAll();
+
     List<Alert> findByType(AlertType type);
+
     List<Alert> findBySeverity(AlertSeverity severity);
+
     List<Alert> findByDeviceId(String deviceId);
+
     List<Alert> findByAcknowledged(boolean acknowledged);
+
     Alert save(Alert alert);
+
     void deleteById(AlertId id);
+
     AlertId nextIdentity();
+
+    List<Alert> findAllByUserId(Long userId);
 }

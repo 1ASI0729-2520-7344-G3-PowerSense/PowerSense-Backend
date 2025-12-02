@@ -33,11 +33,11 @@ public class ReportController {
 	private final DeviceRepository deviceRepository;
 
 	public ReportController(ReportKPIQueryServiceImpl reportKPIQueryService,
-							ReportMonthlyQueryServiceImpl reportMonthlyQueryService,
-							ReportDepartmentsQueryServiceImpl reportDepartmentsQueryService,
-							ReportHistoryQueryServiceImpl reportHistoryQueryService,
-							ReportAssembler reportAssembler,
-							DeviceRepository deviceRepository) {
+			ReportMonthlyQueryServiceImpl reportMonthlyQueryService,
+			ReportDepartmentsQueryServiceImpl reportDepartmentsQueryService,
+			ReportHistoryQueryServiceImpl reportHistoryQueryService,
+			ReportAssembler reportAssembler,
+			DeviceRepository deviceRepository) {
 		this.reportKPIQueryService = reportKPIQueryService;
 		this.reportMonthlyQueryService = reportMonthlyQueryService;
 		this.reportDepartmentsQueryService = reportDepartmentsQueryService;
@@ -87,7 +87,7 @@ public class ReportController {
 		}
 
 		if (period == null || period.equals("week")) {
-			String[] days = {"Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom"};
+			String[] days = { "Lun", "Mar", "Mie", "Jue", "Vie", "Sab", "Dom" };
 			for (String day : days) {
 				double consumption = calculateConsumptionForWeekday(activeDevices, day);
 				result.add(new RealtimeConsumptionResponse("week", day, consumption));
@@ -105,13 +105,19 @@ public class ReportController {
 	}
 
 	private double calculateConsumptionForHour(List<Device> devices, int hour) {
-		double base = devices.stream().mapToDouble(d -> d.getPower().watts()).sum() / 1000.0;
+		double base = devices.stream()
+				.filter(d -> d.getPower() != null)
+				.mapToDouble(d -> d.getPower().watts())
+				.sum() / 1000.0;
 		double factor = (hour >= 18 && hour <= 23) ? 1.2 : (hour >= 0 && hour <= 6) ? 0.8 : 1.0;
 		return base * factor;
 	}
 
 	private double calculateConsumptionForWeekday(List<Device> devices, String day) {
-		double base = devices.stream().mapToDouble(d -> d.getPower().watts()).sum() / 1000.0;
+		double base = devices.stream()
+				.filter(d -> d.getPower() != null)
+				.mapToDouble(d -> d.getPower().watts())
+				.sum() / 1000.0;
 		double factor = switch (day) {
 			case "Sab" -> 0.9;
 			case "Dom" -> 0.85;
@@ -121,7 +127,10 @@ public class ReportController {
 	}
 
 	private double calculateConsumptionForMonthDay(List<Device> devices, int day) {
-		double base = devices.stream().mapToDouble(d -> d.getPower().watts()).sum() / 1000.0;
+		double base = devices.stream()
+				.filter(d -> d.getPower() != null)
+				.mapToDouble(d -> d.getPower().watts())
+				.sum() / 1000.0;
 		double factor = 0.9 + ((day % 10) / 100.0);
 		return base * factor;
 	}

@@ -23,29 +23,33 @@ public class Device {
     private DeviceStatus status;
     private Location location;
     private PowerSpecification power;
+    private Long userId;
 
     private final List<DomainEvent> domainEvents = new ArrayList<>();
 
     public Device(DeviceId id,
-                  DeviceName name,
-                  DeviceCategory category,
-                  DeviceStatus status,
-                  Location location,
-                  PowerSpecification power) {
+            DeviceName name,
+            DeviceCategory category,
+            DeviceStatus status,
+            Location location,
+            PowerSpecification power,
+            Long userId) {
         this.id = Objects.requireNonNull(id, "id");
         this.name = Objects.requireNonNull(name, "name");
         this.category = Objects.requireNonNull(category, "category");
         this.status = Objects.requireNonNull(status, "status");
         this.location = Objects.requireNonNull(location, "location");
         this.power = Objects.requireNonNull(power, "power");
+        this.userId = userId;
     }
 
     public static Device create(DeviceId id,
-                                DeviceName name,
-                                DeviceCategory category,
-                                Location location,
-                                PowerSpecification power) {
-        Device device = new Device(id, name, category, DeviceStatus.INACTIVE, location, power);
+            DeviceName name,
+            DeviceCategory category,
+            Location location,
+            PowerSpecification power,
+            Long userId) {
+        Device device = new Device(id, name, category, DeviceStatus.INACTIVE, location, power, userId);
         device.registerEvent(new DeviceCreated(id.value(), name.value(), Instant.now()));
         return device;
     }
@@ -110,5 +114,9 @@ public class Device {
 
     public PowerSpecification getPower() {
         return power;
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 }

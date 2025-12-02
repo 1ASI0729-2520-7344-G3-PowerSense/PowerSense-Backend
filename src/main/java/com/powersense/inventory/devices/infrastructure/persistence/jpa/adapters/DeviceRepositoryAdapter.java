@@ -17,7 +17,8 @@ public class DeviceRepositoryAdapter implements DeviceRepository {
 
 	private final com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.DeviceRepository jpaRepository;
 
-	public DeviceRepositoryAdapter(com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.DeviceRepository jpaRepository) {
+	public DeviceRepositoryAdapter(
+			com.powersense.inventory.devices.infrastructure.persistence.jpa.repositories.DeviceRepository jpaRepository) {
 		this.jpaRepository = jpaRepository;
 	}
 
@@ -33,7 +34,8 @@ public class DeviceRepositoryAdapter implements DeviceRepository {
 
 	@Override
 	public List<Device> findByRoomId(RoomId roomId) {
-		return jpaRepository.findByLocationRoomId(roomId.value()).stream().map(DeviceEntity::toDomain).collect(Collectors.toList());
+		return jpaRepository.findByLocationRoomId(roomId.value()).stream().map(DeviceEntity::toDomain)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -56,6 +58,11 @@ public class DeviceRepositoryAdapter implements DeviceRepository {
 	public DeviceId nextIdentity() {
 		return new DeviceId("dev-" + UUID.randomUUID());
 	}
+
+	@Override
+	public List<Device> findAllByUserId(Long userId) {
+		return jpaRepository.findAllByUserId(userId).stream()
+				.map(DeviceEntity::toDomain)
+				.collect(Collectors.toList());
+	}
 }
-
-

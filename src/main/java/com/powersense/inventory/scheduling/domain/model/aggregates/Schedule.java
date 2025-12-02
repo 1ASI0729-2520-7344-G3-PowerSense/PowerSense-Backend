@@ -18,6 +18,7 @@ public class Schedule {
 	private String deviceName;
 	private String roomName;
 	private boolean enabled;
+	private Long userId;
 	private final List<ScheduleEntry> entries = new ArrayList<>();
 	private Instant createdAt;
 	private Instant updatedAt;
@@ -25,12 +26,13 @@ public class Schedule {
 	private final List<DomainEvent> domainEvents = new ArrayList<>();
 
 	public Schedule(ScheduleId id, DeviceId deviceId, String deviceName, String roomName, boolean enabled,
-			List<ScheduleEntry> initialEntries) {
+			List<ScheduleEntry> initialEntries, Long userId) {
 		this.id = Objects.requireNonNull(id, "id");
 		this.deviceId = Objects.requireNonNull(deviceId, "deviceId");
 		this.deviceName = Objects.requireNonNull(deviceName, "deviceName");
 		this.roomName = Objects.requireNonNull(roomName, "roomName");
 		this.enabled = enabled;
+		this.userId = userId;
 		if (initialEntries != null) {
 			this.entries.addAll(initialEntries);
 		}
@@ -140,5 +142,9 @@ public class Schedule {
 
 	public Instant getUpdatedAt() {
 		return updatedAt;
+	}
+
+	public Long getUserId() {
+		return userId;
 	}
 }

@@ -8,11 +8,12 @@ import java.util.Optional;
 
 public interface RoomRepository {
     Optional<Room> findById(RoomId id);
+
     List<Room> findAll();
+
     Room save(Room room);
+
     void delete(RoomId id);
+
+    List<Room> findAllByUserId(Long userId);
 }
-
-
-
-

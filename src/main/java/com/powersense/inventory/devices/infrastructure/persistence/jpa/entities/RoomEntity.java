@@ -17,20 +17,24 @@ public class RoomEntity {
 	@Column(nullable = false)
 	private String name;
 
+	@Column(name = "user_id")
+	private Long userId;
+
 	public RoomEntity() {
 	}
 
-	public RoomEntity(String id, String name) {
+	public RoomEntity(String id, String name, Long userId) {
 		this.id = id;
 		this.name = name;
+		this.userId = userId;
 	}
 
 	public static RoomEntity fromDomain(Room room) {
-		return new RoomEntity(room.getId().value(), room.getName().value());
+		return new RoomEntity(room.getId().value(), room.getName().value(), room.getUserId());
 	}
 
 	public Room toDomain() {
-		return new Room(new RoomId(id), new RoomName(name));
+		return new Room(new RoomId(id), new RoomName(name), userId);
 	}
 
 	public String getId() {
@@ -48,6 +52,12 @@ public class RoomEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 }
-
-
